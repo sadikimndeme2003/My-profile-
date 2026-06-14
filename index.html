@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sadiki | Full-Stack Developer & Cybersecurity Specialist</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #0A0F1E;
+      --navy2:   #111827;
+      --navy3:   #1E2A3A;
+      --teal:    #00D4C8;
+      --teal2:   #00A89E;
+      --gold:    #F4A836;
+      --white:   #F8FAFC;
+      --muted:   #94A3B8;
+      --card:    #161E2E;
+      --border:  rgba(0,212,200,0.15);
+      --glow:    0 0 32px rgba(0,212,200,0.18);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none; z-index: 0; opacity: 0.4;
+    }
+
+    /* ── NAVIGATION ── */
+    nav {
+      position: fixed; top: 0; width: 100%; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 1.2rem 5%;
+      background: rgba(10,15,30,0.85);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.4rem; font-weight: 700;
+      color: var(--teal);
+      letter-spacing: -0.5px;
+    }
+    .nav-logo span { color: var(--gold); }
+
+    .nav-links { display: flex; gap: 2rem; list-style: none; }
+    .nav-links a {
+      font-size: 0.85rem; font-weight: 500;
+      color: var(--muted); text-decoration: none;
+      letter-spacing: 0.05em; text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+
+    .nav-cta {
+      padding: 0.55rem 1.4rem;
+      background: var(--teal); color: var(--navy);
+      border-radius: 6px; font-weight: 700;
+      font-size: 0.82rem; text-decoration: none;
+      letter-spacing: 0.04em; text-transform: uppercase;
+      transition: background 0.2s, transform 0.15s;
+    }
+    .nav-cta:hover { background: var(--teal2); transform: translateY(-1px); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: flex; align-items: center;
+      padding: 8rem 5% 5rem;
+      position: relative; overflow: hidden;
+    }
+
+    /* Animated grid background */
+    #hero::after {
+      content: '';
+      position: absolute; inset: 0;
+      background-image:
+        linear-gradient(rgba(0,212,200,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0,212,200,0.04) 1px, transparent 1px);
+      background-size: 50px 50px;
+      animation: gridShift 20s linear infinite;
+    }
+    @keyframes gridShift { from { transform: translateY(0); } to { transform: translateY(50px); } }
+
+    /* Glow orb */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+    }
+    .orb-1 {
+      width: 500px; height: 500px;
+      background: rgba(0,212,200,0.12);
+      top: -100px; right: -100px;
+      animation: float 8s ease-in-out infinite;
+    }
+    .orb-2 {
+      width: 300px; height: 300px;
+      background: rgba(244,168,54,0.08);
+      bottom: 0; left: 10%;
+      animation: float 12s ease-in-out infinite reverse;
+    }
+    @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-30px)} }
+
+    .hero-content { position: relative; z-index: 2; max-width: 750px; }
+
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      background: rgba(0,212,200,0.1);
+      border: 1px solid rgba(0,212,200,0.3);
+      border-radius: 100px;
+      font-size: 0.78rem; font-weight: 600;
+      color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase;
+      margin-bottom: 1.8rem;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      background: var(--teal);
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+    .hero-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 700; line-height: 1.1;
+      letter-spacing: -1.5px;
+      margin-bottom: 1rem;
+    }
+    .hero-title .name { color: var(--teal); }
+    .hero-title .accent { color: var(--gold); }
+
+    /* Terminal typing effect */
+    .terminal-box {
+      background: #0D1117;
+      border: 1px solid rgba(0,212,200,0.25);
+      border-radius: 10px;
+      padding: 1.2rem 1.5rem;
+      margin: 1.8rem 0 2.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.88rem;
+      position: relative;
+    }
+    .terminal-box::before {
+      content: '';
+      position: absolute; top: -1px; left: 20px; right: 20px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--teal), transparent);
+    }
+    .terminal-header {
+      display: flex; gap: 6px; margin-bottom: 0.9rem;
+    }
+    .t-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .t-dot.red { background: #FF5F57; }
+    .t-dot.yellow { background: #FEBC2E; }
+    .t-dot.green { background: #28C840; }
+    .terminal-line { color: var(--muted); line-height: 1.8; }
+    .terminal-line .prompt { color: var(--teal); }
+    .terminal-line .cmd { color: var(--white); }
+    .terminal-line .output { color: #7EE787; }
+    .terminal-line .comment { color: #6E7681; }
+    #typed-text { color: var(--gold); }
+    .cursor {
+      display: inline-block; width: 2px; height: 1em;
+      background: var(--teal); vertical-align: text-bottom;
+      animation: blink 0.8s step-end infinite;
+    }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    .hero-desc {
+      font-size: 1.05rem; color: var(--muted);
+      max-width: 560px; margin-bottom: 2.5rem; line-height: 1.75;
+    }
+
+    .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+    .btn-primary {
+      padding: 0.9rem 2rem;
+      background: var(--teal); color: var(--navy);
+      border-radius: 8px; font-weight: 700;
+      font-size: 0.9rem; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-primary:hover { background: var(--teal2); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,212,200,0.3); }
+    .btn-secondary {
+      padding: 0.9rem 2rem;
+      background: transparent; color: var(--white);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px; font-weight: 600;
+      font-size: 0.9rem; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .btn-secondary:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
+
+    .hero-stats {
+      display: flex; gap: 2.5rem; margin-top: 3.5rem;
+      padding-top: 2.5rem;
+      border-top: 1px solid var(--border);
+      flex-wrap: wrap;
+    }
+    .stat-item { }
+    .stat-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 2rem; font-weight: 700; color: var(--white);
+      line-height: 1;
+    }
+    .stat-num span { color: var(--teal); }
+    .stat-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-top: 0.3rem; }
+
+    /* ── SECTION COMMON ── */
+    section { padding: 6rem 5%; position: relative; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      font-size: 0.75rem; font-weight: 700; letter-spacing: 0.15em;
+      text-transform: uppercase; color: var(--teal);
+      margin-bottom: 1rem;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px; height: 2px; background: var(--teal);
+    }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 700; letter-spacing: -0.5px;
+      margin-bottom: 1rem; line-height: 1.2;
+    }
+    .section-sub { color: var(--muted); font-size: 1rem; max-width: 520px; }
+
+    /* ── ABOUT ── */
+    #about { background: var(--navy2); }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 4rem; align-items: start;
+      margin-top: 3.5rem;
+    }
+
+    .about-photo-wrap {
+      position: sticky; top: 100px;
+    }
+    .photo-frame {
+      width: 100%; aspect-ratio: 4/5;
+      border-radius: 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 1rem;
+      position: relative; overflow: hidden;
+    }
+    .photo-frame::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(0,212,200,0.08), transparent 60%);
+    }
+    .photo-placeholder-icon {
+      width: 90px; height: 90px;
+      background: linear-gradient(135deg, var(--teal), var(--teal2));
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.5rem;
+    }
+    .photo-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem; font-weight: 700; color: var(--white);
+    }
+    .photo-role { font-size: 0.8rem; color: var(--teal); font-weight: 500; }
+    .photo-location { font-size: 0.75rem; color: var(--muted); display: flex; align-items: center; gap: 0.3rem; }
+
+    .upload-hint {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: rgba(0,212,200,0.1);
+      border-top: 1px dashed rgba(0,212,200,0.3);
+      padding: 0.7rem;
+      font-size: 0.72rem; color: var(--teal);
+      text-align: center;
+    }
+
+    .about-text p {
+      color: var(--muted); line-height: 1.8; margin-bottom: 1.2rem;
+      font-size: 0.97rem;
+    }
+    .about-text p strong { color: var(--white); }
+
+    .about-tags {
+      display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1.8rem;
+    }
+    .tag {
+      padding: 0.4rem 0.9rem;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.78rem; color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s;
+    }
+    .tag:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── SKILLS ── */
+    #skills { background: var(--navy); }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3.5rem;
+    }
+    .skill-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.8rem;
+      transition: all 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .skill-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      transform: scaleX(0); transform-origin: left;
+      transition: transform 0.3s;
+    }
+    .skill-card:hover { border-color: rgba(0,212,200,0.4); transform: translateY(-4px); box-shadow: var(--glow); }
+    .skill-card:hover::before { transform: scaleX(1); }
+
+    .skill-icon { font-size: 2rem; margin-bottom: 1rem; }
+    .skill-card h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; margin-bottom: 0.8rem; color: var(--white);
+    }
+    .skill-list { list-style: none; }
+    .skill-list li {
+      font-size: 0.83rem; color: var(--muted);
+      padding: 0.3rem 0;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .skill-list li::before { content: '▸'; color: var(--teal); font-size: 0.7rem; }
+
+    /* ── PROJECTS ── */
+    #projects { background: var(--navy2); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.8rem; margin-top: 3.5rem;
+    }
+    .project-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      transition: all 0.3s;
+    }
+    .project-card:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.4), var(--glow); border-color: rgba(0,212,200,0.3); }
+
+    .project-thumb {
+      height: 180px;
+      background: linear-gradient(135deg, var(--navy3), #1a2a3a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 3.5rem;
+      position: relative; overflow: hidden;
+    }
+    .project-thumb::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, transparent 50%, var(--card));
+    }
+    .project-type-badge {
+      position: absolute; top: 1rem; right: 1rem;
+      padding: 0.3rem 0.7rem;
+      background: rgba(0,212,200,0.15);
+      border: 1px solid rgba(0,212,200,0.3);
+      border-radius: 100px;
+      font-size: 0.7rem; color: var(--teal); font-weight: 600;
+    }
+    .project-body { padding: 1.5rem; }
+    .project-body h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.05rem; font-weight: 700; margin-bottom: 0.6rem;
+    }
+    .project-body p { font-size: 0.85rem; color: var(--muted); line-height: 1.7; margin-bottom: 1.2rem; }
+    .project-stack {
+      display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1.2rem;
+    }
+    .stack-badge {
+      padding: 0.25rem 0.6rem;
+      background: rgba(0,212,200,0.08);
+      border: 1px solid rgba(0,212,200,0.2);
+      border-radius: 4px;
+      font-size: 0.7rem; color: var(--teal);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .project-link {
+      font-size: 0.82rem; color: var(--teal);
+      text-decoration: none; font-weight: 600;
+      display: inline-flex; align-items: center; gap: 0.3rem;
+      transition: gap 0.2s;
+    }
+    .project-link:hover { gap: 0.6rem; }
+
+    /* ── EDUCATION ── */
+    #education { background: var(--navy); }
+    .edu-timeline { margin-top: 3.5rem; position: relative; }
+    .edu-timeline::before {
+      content: '';
+      position: absolute; left: 20px; top: 0; bottom: 0;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--teal), transparent);
+    }
+    .edu-item {
+      display: flex; gap: 2rem;
+      margin-bottom: 2.5rem; position: relative;
+    }
+    .edu-dot {
+      width: 40px; height: 40px; min-width: 40px;
+      background: var(--card);
+      border: 2px solid var(--teal);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; z-index: 1;
+    }
+    .edu-content {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem 1.6rem;
+      flex: 1;
+      transition: all 0.2s;
+    }
+    .edu-content:hover { border-color: rgba(0,212,200,0.35); }
+    .edu-year {
+      font-size: 0.72rem; color: var(--gold); font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    .edu-content h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; margin-bottom: 0.25rem;
+    }
+    .edu-school { font-size: 0.85rem; color: var(--teal); margin-bottom: 0.5rem; font-weight: 500; }
+    .edu-desc { font-size: 0.82rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── CERTIFICATIONS ── */
+    #certifications { background: var(--navy2); }
+    .cert-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1.2rem; margin-top: 3rem;
+    }
+    .cert-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.4rem;
+      text-align: center;
+      transition: all 0.25s;
+    }
+    .cert-card:hover { border-color: var(--teal); transform: translateY(-3px); }
+    .cert-icon { font-size: 2rem; margin-bottom: 0.8rem; }
+    .cert-card h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 0.88rem; font-weight: 700; margin-bottom: 0.3rem;
+    }
+    .cert-issuer { font-size: 0.75rem; color: var(--teal); }
+
+    /* ── CONTACT ── */
+    #contact { background: var(--navy); }
+    .contact-wrap {
+      max-width: 640px; margin: 3.5rem auto 0;
+      text-align: center;
+    }
+    .contact-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700; letter-spacing: -1px;
+      margin-bottom: 1rem; line-height: 1.15;
+    }
+    .contact-title .highlight {
+      background: linear-gradient(90deg, var(--teal), var(--gold));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .contact-desc { color: var(--muted); margin-bottom: 2.5rem; font-size: 1rem; }
+    .contact-links {
+      display: flex; justify-content: center;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    .contact-btn {
+      padding: 0.9rem 1.8rem;
+      border-radius: 8px; font-weight: 600;
+      font-size: 0.88rem; text-decoration: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: all 0.2s;
+    }
+    .cb-fiverr { background: #1DBF73; color: #fff; }
+    .cb-fiverr:hover { background: #17a363; transform: translateY(-2px); }
+    .cb-upwork { background: #6FDA44; color: #000; }
+    .cb-upwork:hover { background: #5ec238; transform: translateY(-2px); }
+    .cb-email { background: var(--card); color: var(--white); border: 1px solid var(--border); }
+    .cb-email:hover { border-color: var(--teal); color: var(--teal); transform: translateY(-2px); }
+    .cb-wa { background: #25D366; color: #fff; }
+    .cb-wa:hover { background: #1da851; transform: translateY(-2px); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 2rem 5%;
+      border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1rem;
+    }
+    footer p { font-size: 0.8rem; color: var(--muted); }
+    .footer-logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1rem; font-weight: 700; color: var(--teal);
+    }
+
+    /* ── SCROLL ANIMATIONS ── */
+    .reveal {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity 0.6s ease, transform 0.6s ease;
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 4%; }
+      .nav-links { display: none; }
+      #hero { padding: 7rem 4% 4rem; }
+      .about-grid { grid-template-columns: 1fr; gap: 2rem; }
+      .about-photo-wrap { position: static; max-width: 260px; margin: 0 auto; }
+      .hero-stats { gap: 1.5rem; }
+      section { padding: 4rem 4%; }
+      .edu-timeline::before { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SAD<span>IKI</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Available for freelance work</div>
+
+    <h1 class="hero-title">
+      Full-Stack Developer<br>
+      <span class="name">& Cybersecurity</span><br>
+      <span class="accent">Specialist</span>
+    </h1>
+
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <div class="t-dot red"></div>
+        <div class="t-dot yellow"></div>
+        <div class="t-dot green"></div>
+      </div>
+      <div class="terminal-line">
+        <span class="prompt">sadiki@dev</span>:<span style="color:#58A6FF">~</span>$ <span class="cmd">whoami</span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">Sadiki — Full-Stack Web Developer & ICT Specialist</span>
+      </div>
+      <div class="terminal-line" style="margin-top:0.5rem">
+        <span class="prompt">sadiki@dev</span>:<span style="color:#58A6FF">~</span>$ <span class="cmd">echo $SPECIALTY</span>
+      </div>
+      <div class="terminal-line">
+        <span class="output">"</span><span id="typed-text"></span><span class="cursor"></span><span class="output">"</span>
+      </div>
+    </div>
+
+    <p class="hero-desc">
+      I build <strong style="color:var(--white)">web applications, management systems, and secure digital solutions</strong>
+      for schools, organisations, and businesses — from conception to deployment.
+      Based in <strong style="color:var(--teal)">Tanzania 🇹🇿</strong>, serving clients worldwide.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#projects" class="btn-primary">View My Work →</a>
+      <a href="#contact" class="btn-secondary">↗ Get In Touch</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-num">3<span>+</span></div>
+        <div class="stat-label">Live Projects</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">2<span>+</span></div>
+        <div class="stat-label">Years Coding</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">5<span>+</span></div>
+        <div class="stat-label">Technologies</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">100<span>%</span></div>
+        <div class="stat-label">Committed</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Who I Am</div>
+  <div class="about-grid">
+    <div class="about-photo-wrap reveal">
+      <div class="photo-frame">
+        <div class="photo-placeholder-icon">👨‍💻</div>
+        <div class="photo-name">Sadiki</div>
+        <div class="photo-role">Full-Stack Developer</div>
+        <div class="photo-location">📍 Tanzania, East Africa</div>
+        <div class="upload-hint">📷 Replace with your photo</div>
+      </div>
+    </div>
+    <div class="about-text reveal">
+      <div class="section-title">Developer. Educator.<br>Problem Solver.</div>
+      <p>
+        I'm a passionate <strong>Full-Stack Web Developer and ICT Specialist</strong> based in Arusha, Tanzania.
+        I blend software development with a deep understanding of education and technology — having built
+        real-world systems for schools and community organisations from scratch.
+      </p>
+      <p>
+        My journey spans <strong>web application development</strong> (HTML, JavaScript, PHP, Supabase),
+        <strong>information systems security</strong>, and <strong>mathematics education</strong> —
+        giving me a unique perspective on building tools that actually solve problems people face.
+      </p>
+      <p>
+        Currently pursuing a degree in <strong>Information & Communication Technology</strong> while
+        simultaneously developing and deploying production web applications. I work efficiently
+        from any device — proving that great software doesn't require expensive hardware,
+        just clear thinking and determination.
+      </p>
+      <div class="about-tags">
+        <span class="tag">HTML / CSS / JS</span>
+        <span class="tag">PHP / MySQL</span>
+        <span class="tag">Supabase</span>
+        <span class="tag">GitHub Pages</span>
+        <span class="tag">Network Security</span>
+        <span class="tag">TryHackMe</span>
+        <span class="tag">PWA</span>
+        <span class="tag">Nmap / tshark</span>
+        <span class="tag">Tanzania 🇹🇿</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">What I Do</div>
+  <div class="section-title">Skills & Expertise</div>
+  <div class="section-sub">Technologies and domains I work with professionally.</div>
+
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">🌐</div>
+      <h3>Frontend Development</h3>
+      <ul class="skill-list">
+        <li>HTML5 / CSS3 / JavaScript (ES6+)</li>
+        <li>Responsive & Mobile-First Design</li>
+        <li>Progressive Web Apps (PWA)</li>
+        <li>Canvas API / DOM Manipulation</li>
+        <li>UI/UX Design Principles</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">⚙️</div>
+      <h3>Backend Development</h3>
+      <ul class="skill-list">
+        <li>PHP — server-side scripting</li>
+        <li>Supabase (PostgreSQL + REST API)</li>
+        <li>MySQL — database design & queries</li>
+        <li>REST API integration</li>
+        <li>Authentication & Role-Based Access</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🔒</div>
+      <h3>Cybersecurity</h3>
+      <ul class="skill-list">
+        <li>Network Security Analysis</li>
+        <li>XSS & SQL Injection (ethical hacking)</li>
+        <li>Nmap — network scanning</li>
+        <li>tshark — packet analysis</li>
+        <li>TryHackMe certified practicals</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🗄️</div>
+      <h3>Database & Systems</h3>
+      <ul class="skill-list">
+        <li>Database schema design</li>
+        <li>SQL — complex queries & joins</li>
+        <li>School Management Systems</li>
+        <li>Member Management Systems</li>
+        <li>Attendance, Fees & Payroll modules</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">📱</div>
+      <h3>Deployment & Tools</h3>
+      <ul class="skill-list">
+        <li>GitHub / GitHub Pages</li>
+        <li>InfinityFree hosting</li>
+        <li>Android-based development</li>
+        <li>Termux / Linux CLI tools</li>
+        <li>Spck Code Editor</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">📚</div>
+      <h3>Education & Content</h3>
+      <ul class="skill-list">
+        <li>Mathematics Teacher (Form 1–3)</li>
+        <li>NECTA exam paper creation</li>
+        <li>TIE curriculum lesson plans</li>
+        <li>Student notes & teaching scripts</li>
+        <li>Educational content writing</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">My Work</div>
+  <div class="section-title">Featured Projects</div>
+  <div class="section-sub">Real systems built and deployed for real users.</div>
+
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#1a2a4a)">
+        🎓
+        <span class="project-type-badge">Live Project</span>
+      </div>
+      <div class="project-body">
+        <h3>Kighare Alumni Management System</h3>
+        <p>A full-featured web application managing alumni members for Kighare Sekondari Class of 2020 — with soft deletes, event tracking, WhatsApp sharing, member status automation, and a Supabase backend.</p>
+        <div class="project-stack">
+          <span class="stack-badge">HTML/JS</span>
+          <span class="stack-badge">Supabase</span>
+          <span class="stack-badge">PWA</span>
+          <span class="stack-badge">Canvas API</span>
+          <span class="stack-badge">GitHub Pages</span>
+        </div>
+        <a href="#contact" class="project-link">View Project →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0d1f12,#1a3a1f)">
+        🏫
+        <span class="project-type-badge">Live Project</span>
+      </div>
+      <div class="project-body">
+        <h3>Mndeme Secondary School ERP</h3>
+        <p>A comprehensive school management system covering students, teachers, subjects, exams, results, attendance, fees, payroll, assets, and SMS result delivery via Notify Africa API. Full UI redesign with modern dark sidebar.</p>
+        <div class="project-stack">
+          <span class="stack-badge">PHP</span>
+          <span class="stack-badge">MySQL</span>
+          <span class="stack-badge">InfinityFree</span>
+          <span class="stack-badge">SMS API</span>
+        </div>
+        <a href="#contact" class="project-link">View Project →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#1a0a28,#2a1a4a)">
+        💰
+        <span class="project-type-badge">Live Project</span>
+      </div>
+      <div class="project-body">
+        <h3>Community Fund Management App</h3>
+        <p>A Supabase-powered community fund tracker with role-based access control, contribution tracking, event management, and a full Swahili interface for Kighare Umoja community group.</p>
+        <div class="project-stack">
+          <span class="stack-badge">HTML/JS</span>
+          <span class="stack-badge">Supabase</span>
+          <span class="stack-badge">Role-Based Auth</span>
+          <span class="stack-badge">Swahili UI</span>
+        </div>
+        <a href="#contact" class="project-link">View Project →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">Background</div>
+  <div class="section-title">Education</div>
+
+  <div class="edu-timeline">
+    <div class="edu-item reveal">
+      <div class="edu-dot">🎓</div>
+      <div class="edu-content">
+        <div class="edu-year">2023 — Present</div>
+        <h3>Degree in Information & Communication Technology</h3>
+        <div class="edu-school">Tanzanian Higher Education Institution</div>
+        <div class="edu-desc">
+          Specialising in Information Systems Security (ICT 222 / CSC 322). Coursework includes network security,
+          ethical hacking, cryptography, database systems, and web application development.
+          Completed practical labs on TryHackMe (XSS, SQL Injection, network analysis).
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">📐</div>
+      <div class="edu-content">
+        <div class="edu-year">2021 — Present</div>
+        <h3>Mathematics Teacher — Form 1 to 3</h3>
+        <div class="edu-school">Arusha Girls Islamic Secondary School, Arusha</div>
+        <div class="edu-desc">
+          Teaching mathematics under the Tanzania Institute of Education (TIE) syllabus.
+          Responsibilities include creating lesson plans, exam papers (NECTA format), student notes,
+          teaching scripts, and observed lesson delivery for Forms 1–3.
+        </div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">🏫</div>
+      <div class="edu-content">
+        <div class="edu-year">2016 — 2020</div>
+        <h3>Secondary School Certificate (Form 1–6)</h3>
+        <div class="edu-school">Kighare Secondary School</div>
+        <div class="edu-desc">
+          Completed ordinary and advanced level secondary education.
+          Strong foundation in Mathematics and Sciences.
+          Member of Class of 2020 alumni community.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTIFICATIONS -->
+<section id="certifications">
+  <div class="section-label">Credentials</div>
+  <div class="section-title">Certifications & Training</div>
+
+  <div class="cert-grid">
+    <div class="cert-card reveal">
+      <div class="cert-icon">🛡️</div>
+      <h4>XSS — Reflected & Stored</h4>
+      <div class="cert-issuer">TryHackMe</div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">💉</div>
+      <h4>SQL Injection</h4>
+      <div class="cert-issuer">TryHackMe</div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🌐</div>
+      <h4>Network Security Analysis</h4>
+      <div class="cert-issuer">ICT 222 / CSC 322</div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">🔍</div>
+      <h4>Nmap & Packet Analysis</h4>
+      <div class="cert-issuer">Practical Lab — Termux</div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📊</div>
+      <h4>Database Management</h4>
+      <div class="cert-issuer">MySQL + Supabase Projects</div>
+    </div>
+    <div class="cert-card reveal">
+      <div class="cert-icon">📱</div>
+      <h4>PWA Development</h4>
+      <div class="cert-issuer">Self-Taught — Deployed Projects</div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-wrap reveal">
+    <div class="section-label" style="justify-content:center">Get In Touch</div>
+    <div class="contact-title">
+      Let's Build<br>
+      <span class="highlight">Something Great</span><br>
+      Together
+    </div>
+    <p class="contact-desc">
+      Looking for a reliable developer who delivers clean, functional web applications?
+      I'm available for freelance projects on Fiverr, Upwork, or direct contact.
+    </p>
+    <div class="contact-links">
+      <a href="https://fiverr.com" target="_blank" class="contact-btn cb-fiverr">
+        🟢 Hire on Fiverr
+      </a>
+      <a href="https://upwork.com" target="_blank" class="contact-btn cb-upwork">
+        💼 Hire on Upwork
+      </a>
+      <a href="mailto:your@email.com" class="contact-btn cb-email">
+        ✉️ Email Me
+      </a>
+      <a href="https://wa.me/255XXXXXXXXX" target="_blank" class="contact-btn cb-wa">
+        📱 WhatsApp
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">SADIKI</div>
+  <p>© 2025 Sadiki. Full-Stack Developer — Tanzania 🇹🇿</p>
+  <p style="font-size:0.75rem; color:var(--muted)">Built with HTML · CSS · JavaScript</p>
+</footer>
+
+<script>
+  // ── TYPING EFFECT ──
+  const phrases = [
+    "Web App Development",
+    "School Management Systems",
+    "Supabase + JavaScript",
+    "Cybersecurity Analysis",
+    "PHP + MySQL Backend",
+    "PWA & Mobile-First"
+  ];
+  let pIdx = 0, cIdx = 0, deleting = false;
+  const el = document.getElementById('typed-text');
+
+  function type() {
+    const word = phrases[pIdx];
+    if (!deleting) {
+      el.textContent = word.slice(0, ++cIdx);
+      if (cIdx === word.length) {
+        deleting = true;
+        return setTimeout(type, 1800);
+      }
+    } else {
+      el.textContent = word.slice(0, --cIdx);
+      if (cIdx === 0) {
+        deleting = false;
+        pIdx = (pIdx + 1) % phrases.length;
+      }
+    }
+    setTimeout(type, deleting ? 50 : 80);
+  }
+  type();
+
+  // ── SCROLL REVEAL ──
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), i * 80);
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
