@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sadiki Daudi Ramadhani | Full-Stack Developer & Educator</title>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{
+      --navy:#0A0F1E;--navy2:#111827;--navy3:#1E2A3A;
+      --teal:#00D4C8;--teal2:#00A89E;--gold:#F4A836;
+      --white:#F8FAFC;--muted:#94A3B8;--card:#161E2E;
+      --border:rgba(0,212,200,0.15);--glow:0 0 32px rgba(0,212,200,0.18);
+    }
+    html{scroll-behavior:smooth}
+    body{font-family:'Inter',sans-serif;background:var(--navy);color:var(--white);line-height:1.6;overflow-x:hidden}
+    body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0;opacity:0.4}
+
+    /* HERO IMAGE SECTION */
+    #hero-image{
+      width:100%;height:100vh;
+      position:relative;overflow:hidden;
+      background:var(--navy);
+      display:flex;align-items:center;justify-content:center;
+      cursor:pointer;
+    }
+    #hero-img-el{
+      width:100%;height:100%;
+      object-fit:cover;object-position:center top;
+      display:none;
+    }
+    #hero-img-el.loaded{display:block}
+    .hero-img-overlay{
+      position:absolute;inset:0;
+      background:linear-gradient(to bottom,
+        rgba(10,15,30,0.1) 0%,
+        rgba(10,15,30,0.0) 40%,
+        rgba(10,15,30,0.7) 85%,
+        rgba(10,15,30,1) 100%);
+      z-index:1;pointer-events:none;
+    }
+    .hero-img-placeholder{
+      display:flex;flex-direction:column;align-items:center;
+      justify-content:center;gap:1rem;
+      color:var(--muted);text-align:center;
+      padding:2rem;z-index:2;position:relative;
+      transition:opacity 0.3s;
+    }
+    .hero-img-placeholder.hidden{display:none}
+    .upload-circle{
+      width:120px;height:120px;border-radius:50%;
+      border:2px dashed rgba(0,212,200,0.4);
+      display:flex;align-items:center;justify-content:center;
+      font-size:3rem;
+      background:rgba(0,212,200,0.05);
+      transition:all 0.3s;
+      animation:pulse-border 2s ease-in-out infinite;
+    }
+    @keyframes pulse-border{
+      0%,100%{border-color:rgba(0,212,200,0.4)}
+      50%{border-color:rgba(0,212,200,0.9);box-shadow:0 0 24px rgba(0,212,200,0.2)}
+    }
+    #hero-image:hover .upload-circle{
+      border-color:var(--teal);
+      background:rgba(0,212,200,0.1);
+      transform:scale(1.05);
+    }
+    .hero-img-placeholder h3{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:1.2rem;font-weight:700;color:var(--white);
+    }
+    .hero-img-placeholder p{font-size:0.85rem;color:var(--muted);max-width:280px;line-height:1.6}
+    .upload-btn-label{
+      display:inline-flex;align-items:center;gap:0.5rem;
+      padding:0.75rem 1.8rem;
+      background:var(--teal);color:var(--navy);
+      border-radius:8px;font-weight:700;font-size:0.88rem;
+      cursor:pointer;transition:all 0.2s;
+      margin-top:0.5rem;
+    }
+    .upload-btn-label:hover{background:var(--teal2);transform:translateY(-2px)}
+    #hero-file-input{display:none}
+    /* Change photo button (shown after upload) */
+    .change-photo-btn{
+      position:absolute;bottom:2rem;right:2rem;
+      z-index:10;
+      display:none;
+      align-items:center;gap:0.5rem;
+      padding:0.6rem 1.2rem;
+      background:rgba(10,15,30,0.8);
+      border:1px solid rgba(0,212,200,0.4);
+      border-radius:8px;color:var(--teal);
+      font-size:0.8rem;font-weight:600;
+      cursor:pointer;backdrop-filter:blur(8px);
+      transition:all 0.2s;
+    }
+    .change-photo-btn.visible{display:flex}
+    .change-photo-btn:hover{background:rgba(0,212,200,0.15)}
+    /* Name overlay on hero image */
+    .hero-img-name{
+      position:absolute;bottom:5rem;left:5%;
+      z-index:5;display:none;
+    }
+    .hero-img-name.visible{display:block}
+    .hero-img-name h2{
+      font-family:'Space Grotesk',sans-serif;
+      font-size:clamp(2rem,5vw,3.5rem);
+      font-weight:700;color:#fff;
+      letter-spacing:-1px;line-height:1.1;
+      text-shadow:0 2px 20px rgba(0,0,0,0.5);
+    }
+    .hero-img-name p{
+      font-size:1rem;color:var(--teal);
+      font-weight:600;margin-top:0.4rem;
+      text-shadow:0 2px 10px rgba(0,0,0,0.5);
+    }
+    .scroll-hint{
+      position:absolute;bottom:1.5rem;left:50%;
+      transform:translateX(-50%);
+      z-index:10;display:flex;flex-direction:column;
+      align-items:center;gap:0.4rem;
+      color:var(--muted);font-size:0.72rem;
+      letter-spacing:0.1em;text-transform:uppercase;
+      animation:bounce 2s ease-in-out infinite;
+    }
+    @keyframes bounce{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(-8px)}}
+    .scroll-arrow{font-size:1.2rem;color:var(--teal)}
+
+    /* NAV */
+    nav{position:fixed;top:0;width:100%;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:1.1rem 5%;background:rgba(10,15,30,0.88);backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+    .nav-logo{font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;color:var(--teal);letter-spacing:-0.5px}
+    .nav-logo span{color:var(--gold)}
+    .nav-links{display:flex;gap:1.8rem;list-style:none}
+    .nav-links a{font-size:0.8rem;font-weight:500;color:var(--muted);text-decoration:none;letter-spacing:0.05em;text-transform:uppercase;transition:color 0.2s}
+    .nav-links a:hover{color:var(--teal)}
+    .nav-cta{padding:0.5rem 1.3rem;background:var(--teal);color:var(--navy);border-radius:6px;font-weight:700;font-size:0.8rem;text-decoration:none;letter-spacing:0.04em;text-transform:uppercase;transition:all 0.2s}
+    .nav-cta:hover{background:var(--teal2);transform:translateY(-1px)}
+
+    /* HERO */
+    #hero{min-height:100vh;display:flex;align-items:center;padding:8rem 5% 5rem;position:relative;overflow:hidden}
+    #hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(0,212,200,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,200,0.04) 1px,transparent 1px);background-size:50px 50px;animation:gridShift 20s linear infinite}
+    @keyframes gridShift{from{transform:translateY(0)}to{transform:translateY(50px)}}
+    .orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none}
+    .orb-1{width:500px;height:500px;background:rgba(0,212,200,0.12);top:-100px;right:-100px;animation:float 8s ease-in-out infinite}
+    .orb-2{width:300px;height:300px;background:rgba(244,168,54,0.08);bottom:0;left:10%;animation:float 12s ease-in-out infinite reverse}
+    @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-30px)}}
+    .hero-content{position:relative;z-index:2;max-width:780px}
+    .hero-badge{display:inline-flex;align-items:center;gap:0.5rem;padding:0.4rem 1rem;background:rgba(0,212,200,0.1);border:1px solid rgba(0,212,200,0.3);border-radius:100px;font-size:0.75rem;font-weight:600;color:var(--teal);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:1.5rem}
+    .hero-badge::before{content:'';width:6px;height:6px;background:var(--teal);border-radius:50%;animation:pulse 1.5s infinite}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.3}}
+    .hero-name{font-family:'Space Grotesk',sans-serif;font-size:clamp(1rem,2.5vw,1.15rem);font-weight:500;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.6rem}
+    .hero-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(2.4rem,5.5vw,4.2rem);font-weight:700;line-height:1.1;letter-spacing:-1.5px;margin-bottom:0.8rem}
+    .hero-title .teal{color:var(--teal)}.hero-title .gold{color:var(--gold)}
+    .terminal-box{background:#0D1117;border:1px solid rgba(0,212,200,0.25);border-radius:10px;padding:1.1rem 1.4rem;margin:1.6rem 0 2rem;font-family:'JetBrains Mono',monospace;font-size:0.85rem;position:relative}
+    .terminal-box::before{content:'';position:absolute;top:-1px;left:20px;right:20px;height:2px;background:linear-gradient(90deg,transparent,var(--teal),transparent)}
+    .terminal-header{display:flex;gap:6px;margin-bottom:0.8rem}
+    .t-dot{width:10px;height:10px;border-radius:50%}
+    .t-dot.red{background:#FF5F57}.t-dot.yellow{background:#FEBC2E}.t-dot.green{background:#28C840}
+    .terminal-line{color:var(--muted);line-height:1.9}
+    .terminal-line .prompt{color:var(--teal)}.terminal-line .cmd{color:var(--white)}.terminal-line .output{color:#7EE787}
+    #typed-text{color:var(--gold)}
+    .cursor{display:inline-block;width:2px;height:1em;background:var(--teal);vertical-align:text-bottom;animation:blink 0.8s step-end infinite}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .hero-desc{font-size:1rem;color:var(--muted);max-width:580px;margin-bottom:2rem;line-height:1.8}
+    .hero-actions{display:flex;gap:1rem;flex-wrap:wrap}
+    .btn-primary{padding:0.85rem 1.8rem;background:var(--teal);color:var(--navy);border-radius:8px;font-weight:700;font-size:0.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;transition:all 0.2s}
+    .btn-primary:hover{background:var(--teal2);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,212,200,0.3)}
+    .btn-secondary{padding:0.85rem 1.8rem;background:transparent;color:var(--white);border:1px solid rgba(255,255,255,0.2);border-radius:8px;font-weight:600;font-size:0.88rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;transition:all 0.2s}
+    .btn-secondary:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+    .hero-stats{display:flex;gap:2.5rem;margin-top:3rem;padding-top:2.5rem;border-top:1px solid var(--border);flex-wrap:wrap}
+    .stat-num{font-family:'Space Grotesk',sans-serif;font-size:2rem;font-weight:700;color:var(--white);line-height:1}
+    .stat-num span{color:var(--teal)}
+    .stat-label{font-size:0.74rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em;margin-top:0.3rem}
+
+    /* SECTIONS */
+    section{padding:6rem 5%;position:relative}
+    .section-label{display:inline-flex;align-items:center;gap:0.6rem;font-size:0.72rem;font-weight:700;letter-spacing:0.15em;text-transform:uppercase;color:var(--teal);margin-bottom:0.8rem}
+    .section-label::before{content:'';width:24px;height:2px;background:var(--teal)}
+    .section-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:700;letter-spacing:-0.5px;margin-bottom:0.8rem;line-height:1.2}
+    .section-sub{color:var(--muted);font-size:0.95rem;max-width:520px}
+
+    /* ABOUT */
+    #about{background:var(--navy2)}
+    .about-grid{display:grid;grid-template-columns:260px 1fr;gap:4rem;align-items:start;margin-top:3rem}
+    .about-photo-wrap{position:sticky;top:100px}
+    .photo-frame{width:100%;aspect-ratio:3/4;border-radius:16px;background:var(--card);border:1px solid var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.8rem;position:relative;overflow:hidden}
+    .photo-frame::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,212,200,0.08),transparent 60%)}
+    .photo-placeholder-icon{width:80px;height:80px;background:linear-gradient(135deg,var(--teal),var(--teal2));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.2rem}
+    .photo-name{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--white);text-align:center;padding:0 1rem}
+    .photo-role{font-size:0.75rem;color:var(--teal);font-weight:500;text-align:center;padding:0 0.5rem}
+    .photo-location{font-size:0.72rem;color:var(--muted);text-align:center}
+    .photo-contacts{display:flex;flex-direction:column;gap:0.3rem;padding:0 1rem;width:100%}
+    .photo-contact-item{font-size:0.68rem;color:var(--muted);font-family:'JetBrains Mono',monospace;word-break:break-all;text-align:center}
+    .upload-hint{position:absolute;bottom:0;left:0;right:0;background:rgba(0,212,200,0.1);border-top:1px dashed rgba(0,212,200,0.3);padding:0.6rem;font-size:0.68rem;color:var(--teal);text-align:center}
+    .about-text p{color:var(--muted);line-height:1.8;margin-bottom:1.1rem;font-size:0.95rem}
+    .about-text p strong{color:var(--white)}
+    .about-tags{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1.5rem}
+    .tag{padding:0.35rem 0.8rem;background:var(--card);border:1px solid var(--border);border-radius:100px;font-size:0.74rem;color:var(--muted);font-family:'JetBrains Mono',monospace;transition:all 0.2s}
+    .tag:hover{border-color:var(--teal);color:var(--teal)}
+
+    /* QUICK INFO CARDS */
+    .info-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;margin-top:1.5rem}
+    .info-chip{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;display:flex;flex-direction:column;gap:0.25rem}
+    .info-chip-label{font-size:0.68rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:700}
+    .info-chip-value{font-size:0.82rem;color:var(--white);font-weight:500}
+
+    /* SKILLS */
+    #skills{background:var(--navy)}
+    .skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1.4rem;margin-top:3rem}
+    .skill-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1.6rem;transition:all 0.3s;position:relative;overflow:hidden}
+    .skill-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--teal),var(--gold));transform:scaleX(0);transform-origin:left;transition:transform 0.3s}
+    .skill-card:hover{border-color:rgba(0,212,200,0.4);transform:translateY(-4px);box-shadow:var(--glow)}
+    .skill-card:hover::before{transform:scaleX(1)}
+    .skill-icon{font-size:1.8rem;margin-bottom:0.8rem}
+    .skill-card h3{font-family:'Space Grotesk',sans-serif;font-size:0.95rem;font-weight:700;margin-bottom:0.7rem;color:var(--white)}
+    .skill-list{list-style:none}
+    .skill-list li{font-size:0.8rem;color:var(--muted);padding:0.25rem 0;display:flex;align-items:center;gap:0.5rem}
+    .skill-list li::before{content:'▸';color:var(--teal);font-size:0.68rem}
+
+    /* LANGUAGES PILLS */
+    .lang-pills{display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.8rem}
+    .lang-pill{padding:0.3rem 0.75rem;border-radius:6px;font-size:0.72rem;font-family:'JetBrains Mono',monospace;font-weight:600;border:1px solid}
+    .lp-py{background:rgba(55,118,171,0.15);border-color:rgba(55,118,171,0.4);color:#4B9FDE}
+    .lp-js{background:rgba(247,220,111,0.1);border-color:rgba(247,220,111,0.3);color:#F7DC6F}
+    .lp-php{background:rgba(119,123,180,0.15);border-color:rgba(119,123,180,0.4);color:#9B9FD4}
+    .lp-html{background:rgba(228,77,38,0.12);border-color:rgba(228,77,38,0.3);color:#E4662A}
+    .lp-css{background:rgba(38,77,228,0.12);border-color:rgba(38,77,228,0.3);color:#5B8EF0}
+    .lp-c{background:rgba(0,212,200,0.1);border-color:rgba(0,212,200,0.3);color:var(--teal)}
+    .lp-cpp{background:rgba(0,112,200,0.1);border-color:rgba(0,112,200,0.3);color:#5BC0F8}
+
+    /* EXPERIENCE */
+    #experience{background:var(--navy2)}
+    .exp-timeline{margin-top:3rem;position:relative}
+    .exp-timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--teal),transparent)}
+    .exp-item{display:flex;gap:1.8rem;margin-bottom:2rem;position:relative}
+    .exp-dot{width:40px;height:40px;min-width:40px;background:var(--card);border:2px solid var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;z-index:1}
+    .exp-content{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.3rem 1.5rem;flex:1;transition:all 0.2s}
+    .exp-content:hover{border-color:rgba(0,212,200,0.35)}
+    .exp-period{font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.35rem}
+    .exp-content h3{font-family:'Space Grotesk',sans-serif;font-size:0.98rem;font-weight:700;margin-bottom:0.2rem}
+    .exp-org{font-size:0.82rem;color:var(--teal);margin-bottom:0.5rem;font-weight:500}
+    .exp-desc{font-size:0.8rem;color:var(--muted);line-height:1.6}
+    .exp-tags{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.7rem}
+    .exp-tag{padding:0.2rem 0.6rem;background:rgba(0,212,200,0.08);border:1px solid rgba(0,212,200,0.2);border-radius:4px;font-size:0.68rem;color:var(--teal);font-family:'JetBrains Mono',monospace}
+
+    /* PROJECTS */
+    #projects{background:var(--navy)}
+    .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.6rem;margin-top:3rem}
+    .project-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;transition:all 0.3s}
+    .project-card:hover{transform:translateY(-6px);box-shadow:0 24px 48px rgba(0,0,0,0.4),var(--glow);border-color:rgba(0,212,200,0.3)}
+    .project-thumb{height:160px;display:flex;align-items:center;justify-content:center;font-size:3rem;position:relative;overflow:hidden}
+    .project-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,var(--card))}
+    .project-type-badge{position:absolute;top:0.8rem;right:0.8rem;padding:0.25rem 0.6rem;background:rgba(0,212,200,0.15);border:1px solid rgba(0,212,200,0.3);border-radius:100px;font-size:0.65rem;color:var(--teal);font-weight:700;z-index:2}
+    .project-body{padding:1.3rem}
+    .project-body h3{font-family:'Space Grotesk',sans-serif;font-size:0.98rem;font-weight:700;margin-bottom:0.5rem}
+    .project-body p{font-size:0.8rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+    .project-stack{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1rem}
+    .stack-badge{padding:0.2rem 0.55rem;background:rgba(0,212,200,0.08);border:1px solid rgba(0,212,200,0.2);border-radius:4px;font-size:0.66rem;color:var(--teal);font-family:'JetBrains Mono',monospace}
+    .project-link{font-size:0.78rem;color:var(--teal);text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:0.3rem;transition:gap 0.2s}
+    .project-link:hover{gap:0.6rem}
+
+    /* EDUCATION */
+    #education{background:var(--navy2)}
+    .edu-timeline{margin-top:3rem;position:relative}
+    .edu-timeline::before{content:'';position:absolute;left:20px;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--teal),transparent)}
+    .edu-item{display:flex;gap:1.8rem;margin-bottom:2rem;position:relative}
+    .edu-dot{width:40px;height:40px;min-width:40px;background:var(--card);border:2px solid var(--teal);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.95rem;z-index:1}
+    .edu-content{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.3rem 1.5rem;flex:1;transition:all 0.2s}
+    .edu-content:hover{border-color:rgba(0,212,200,0.35)}
+    .edu-year{font-size:0.7rem;color:var(--gold);font-weight:700;letter-spacing:0.1em;text-transform:uppercase;margin-bottom:0.35rem}
+    .edu-content h3{font-family:'Space Grotesk',sans-serif;font-size:0.98rem;font-weight:700;margin-bottom:0.2rem}
+    .edu-school{font-size:0.82rem;color:var(--teal);margin-bottom:0.4rem;font-weight:500}
+    .edu-desc{font-size:0.8rem;color:var(--muted);line-height:1.6}
+
+    /* CERTS */
+    #certifications{background:var(--navy)}
+    .cert-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:1rem;margin-top:2.5rem}
+    .cert-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.3rem;text-align:center;transition:all 0.25s}
+    .cert-card:hover{border-color:var(--teal);transform:translateY(-3px)}
+    .cert-icon{font-size:1.8rem;margin-bottom:0.7rem}
+    .cert-card h4{font-family:'Space Grotesk',sans-serif;font-size:0.82rem;font-weight:700;margin-bottom:0.3rem}
+    .cert-issuer{font-size:0.7rem;color:var(--teal)}
+
+    /* CONTACT */
+    #contact{background:var(--navy2)}
+    .contact-wrap{max-width:680px;margin:3rem auto 0;text-align:center}
+    .contact-title{font-family:'Space Grotesk',sans-serif;font-size:clamp(2rem,5vw,3.2rem);font-weight:700;letter-spacing:-1px;margin-bottom:0.8rem;line-height:1.15}
+    .contact-title .highlight{background:linear-gradient(90deg,var(--teal),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .contact-desc{color:var(--muted);margin-bottom:2rem;font-size:0.95rem;line-height:1.7}
+    .contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;margin-bottom:1.5rem}
+    .contact-info-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:1rem;text-align:left;display:flex;align-items:center;gap:0.8rem}
+    .contact-info-card .ci-icon{font-size:1.3rem}
+    .ci-label{font-size:0.65rem;color:var(--teal);text-transform:uppercase;letter-spacing:0.1em;font-weight:700}
+    .ci-value{font-size:0.8rem;color:var(--white);font-weight:500;word-break:break-all}
+    .contact-links{display:flex;justify-content:center;flex-wrap:wrap;gap:0.8rem;margin-top:1.5rem}
+    .contact-btn{padding:0.85rem 1.6rem;border-radius:8px;font-weight:700;font-size:0.85rem;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;transition:all 0.2s}
+    .cb-fiverr{background:#1DBF73;color:#fff}.cb-fiverr:hover{background:#17a363;transform:translateY(-2px)}
+    .cb-upwork{background:#6FDA44;color:#000}.cb-upwork:hover{background:#5ec238;transform:translateY(-2px)}
+    .cb-wa{background:#25D366;color:#fff}.cb-wa:hover{background:#1da851;transform:translateY(-2px)}
+    .cb-email{background:var(--card);color:var(--white);border:1px solid var(--border)}.cb-email:hover{border-color:var(--teal);color:var(--teal);transform:translateY(-2px)}
+
+    /* FOOTER */
+    footer{padding:1.8rem 5%;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem}
+    footer p{font-size:0.78rem;color:var(--muted)}
+    .footer-logo{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:700;color:var(--teal)}
+
+    /* REVEAL */
+    .reveal{opacity:0;transform:translateY(28px);transition:opacity 0.6s ease,transform 0.6s ease}
+    .reveal.visible{opacity:1;transform:translateY(0)}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .nav-links{display:none}
+      #hero{padding:7rem 4% 4rem}
+      .about-grid{grid-template-columns:1fr;gap:2rem}
+      .about-photo-wrap{position:static;max-width:240px;margin:0 auto}
+      section{padding:4rem 4%}
+      .edu-timeline::before,.exp-timeline::before{display:none}
+      .contact-grid{grid-template-columns:1fr}
+    }
+    @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+  </style>
+</head>
+<body>
+
+<!-- HERO IMAGE — First thing visitor sees -->
+<div id="hero-image" onclick="document.getElementById('hero-file-input').click()">
+  <img id="hero-img-el" alt="Sadiki Daudi Ramadhani"/>
+  <div class="hero-img-overlay"></div>
+
+  <!-- Placeholder shown before image upload -->
+  <div class="hero-img-placeholder" id="img-placeholder">
+    <div class="upload-circle">📷</div>
+    <h3>Add Your Cover Photo</h3>
+    <p>Picha yako itaonekana hapa kama kitu cha kwanza mtu anapotembelea portfolio yako</p>
+    <label class="upload-btn-label" for="hero-file-input">
+      ⬆️ Chagua Picha
+    </label>
+  </div>
+
+  <!-- Name overlay shown after image upload -->
+  <div class="hero-img-name" id="img-name-overlay">
+    <h2>Sadiki Daudi<br>Ramadhani</h2>
+    <p>Full-Stack Developer · Educator · ICT Specialist</p>
+  </div>
+
+  <!-- Scroll hint -->
+  <div class="scroll-hint">
+    <span class="scroll-arrow">↓</span>
+    <span>Scroll</span>
+  </div>
+
+  <!-- Change photo button -->
+  <label class="change-photo-btn" id="change-btn" for="hero-file-input">
+    🔄 Change Photo
+  </label>
+
+  <input type="file" id="hero-file-input" accept="image/*"/>
+</div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">SDR<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#education">Education</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a href="#contact" class="nav-cta">Hire Me</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Available for freelance work worldwide</div>
+    <div class="hero-name">Sadiki Daudi Ramadhani</div>
+    <h1 class="hero-title">
+      Full-Stack Developer<br>
+      <span class="teal">Educator</span> &
+      <span class="gold">ICT Specialist</span>
+    </h1>
+    <div class="terminal-box">
+      <div class="terminal-header">
+        <div class="t-dot red"></div><div class="t-dot yellow"></div><div class="t-dot green"></div>
+      </div>
+      <div class="terminal-line"><span class="prompt">sadiki@dev</span>:<span style="color:#58A6FF">~</span>$ <span class="cmd">cat skills.txt</span></div>
+      <div class="terminal-line"><span class="output">→ </span><span id="typed-text"></span><span class="cursor"></span></div>
+      <div class="terminal-line" style="margin-top:0.4rem"><span class="prompt">sadiki@dev</span>:<span style="color:#58A6FF">~</span>$ <span class="cmd">echo $LOCATION</span></div>
+      <div class="terminal-line"><span class="output">Arusha, Tanzania 🇹🇿 | Available globally</span></div>
+    </div>
+    <p class="hero-desc">
+      I design and build <strong style="color:var(--white)">web applications, school management systems, and secure digital tools</strong>
+      for institutions and businesses. With a background in both <strong style="color:var(--teal)">software development</strong>
+      and <strong style="color:var(--gold)">education</strong>, I build solutions that truly serve people.
+    </p>
+    <div class="hero-actions">
+      <a href="#projects" class="btn-primary">View My Work →</a>
+      <a href="#contact" class="btn-secondary">↗ Hire Me</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">3<span>+</span></div><div class="stat-label">Live Projects</div></div>
+      <div class="stat-item"><div class="stat-num">4<span>+</span></div><div class="stat-label">Schools Served</div></div>
+      <div class="stat-item"><div class="stat-num">7<span>+</span></div><div class="stat-label">Languages</div></div>
+      <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Languages Spoken</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="section-label">Who I Am</div>
+  <div class="about-grid">
+    <div class="about-photo-wrap reveal">
+      <div class="photo-frame">
+        <div class="photo-placeholder-icon">👨‍💻</div>
+        <div class="photo-name">Sadiki Daudi Ramadhani</div>
+        <div class="photo-role">Developer · Educator · ICT Specialist</div>
+        <div class="photo-location">📍 Arusha, Tanzania</div>
+        <div class="photo-contacts">
+          <div class="photo-contact-item">📧 sadikimndeme650@gmail.com</div>
+          <div class="photo-contact-item">📱 +255 613 554 953</div>
+        </div>
+        <div class="upload-hint">📷 Add your photo here</div>
+      </div>
+      <div class="info-strip" style="margin-top:1rem">
+        <div class="info-chip"><div class="info-chip-label">Nationality</div><div class="info-chip-value">Tanzanian 🇹🇿</div></div>
+        <div class="info-chip"><div class="info-chip-label">Status</div><div class="info-chip-value">Single</div></div>
+        <div class="info-chip"><div class="info-chip-label">Gender</div><div class="info-chip-value">Male</div></div>
+        <div class="info-chip"><div class="info-chip-label">DOB</div><div class="info-chip-value">Feb 9, 2003</div></div>
+      </div>
+    </div>
+
+    <div class="about-text reveal">
+      <div class="section-title">Developer. Educator.<br>Problem Solver.</div>
+      <p>
+        I am <strong>Sadiki Daudi Ramadhani</strong> — a passionate Full-Stack Web Developer, Computer Science Teacher,
+        and ICT Specialist based in Arusha, Tanzania. I combine deep technical expertise with hands-on
+        classroom experience to build tools that genuinely work for schools and communities.
+      </p>
+      <p>
+        Currently pursuing a <strong>Degree in Education (Science, Mathematics & Computer Science)</strong>
+        at Mwenge Catholic University (MWECAU), I have already built and deployed multiple
+        production-grade systems used by real organisations — including school ERPs, alumni management
+        systems, and community fund trackers.
+      </p>
+      <p>
+        I have taught <strong>Mathematics and Computer Science</strong> at secondary school level, giving me
+        a unique understanding of how technology should serve education. I speak
+        <strong>Swahili, English, and Arabic</strong> fluently.
+      </p>
+      <div class="about-tags">
+        <span class="tag">HTML/CSS/JS</span><span class="tag">PHP/MySQL</span>
+        <span class="tag">Python</span><span class="tag">C / C++</span>
+        <span class="tag">Supabase</span><span class="tag">GitHub Pages</span>
+        <span class="tag">Network Security</span><span class="tag">TryHackMe</span>
+        <span class="tag">PWA</span><span class="tag">Swahili 🇹🇿</span>
+        <span class="tag">English</span><span class="tag">Arabic</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="section-label">What I Do</div>
+  <div class="section-title">Skills & Technologies</div>
+  <div class="section-sub">Languages, frameworks, and domains I work with professionally.</div>
+
+  <div class="skills-grid">
+    <div class="skill-card reveal">
+      <div class="skill-icon">💻</div>
+      <h3>Programming Languages</h3>
+      <div class="lang-pills">
+        <span class="lang-pill lp-js">JavaScript</span>
+        <span class="lang-pill lp-py">Python</span>
+        <span class="lang-pill lp-php">PHP</span>
+        <span class="lang-pill lp-html">HTML5</span>
+        <span class="lang-pill lp-css">CSS3</span>
+        <span class="lang-pill lp-c">C</span>
+        <span class="lang-pill lp-cpp">C++</span>
+      </div>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🌐</div>
+      <h3>Frontend Development</h3>
+      <ul class="skill-list">
+        <li>Responsive & Mobile-First Design</li>
+        <li>Progressive Web Apps (PWA)</li>
+        <li>Canvas API / DOM Manipulation</li>
+        <li>WhatsApp sharing integration</li>
+        <li>UI/UX design principles</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">⚙️</div>
+      <h3>Backend & Database</h3>
+      <ul class="skill-list">
+        <li>PHP — server-side scripting</li>
+        <li>Supabase (PostgreSQL + REST API)</li>
+        <li>MySQL — schema design & queries</li>
+        <li>Role-based access control</li>
+        <li>REST API integration (SMS, etc.)</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🔒</div>
+      <h3>Cybersecurity</h3>
+      <ul class="skill-list">
+        <li>Network Security Analysis</li>
+        <li>XSS (Reflected & Stored) — ethical</li>
+        <li>SQL Injection testing</li>
+        <li>Nmap — network scanning</li>
+        <li>tshark — packet capture & analysis</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">📱</div>
+      <h3>Deployment & Tools</h3>
+      <ul class="skill-list">
+        <li>GitHub / GitHub Pages</li>
+        <li>InfinityFree web hosting</li>
+        <li>MS Word, Excel, PowerPoint</li>
+        <li>Android-based development</li>
+        <li>Termux / Linux CLI</li>
+      </ul>
+    </div>
+    <div class="skill-card reveal">
+      <div class="skill-icon">🗣️</div>
+      <h3>Language Proficiency</h3>
+      <ul class="skill-list">
+        <li>Swahili — Native (Read/Write/Speak)</li>
+        <li>English — Very Good (Read/Write/Speak)</li>
+        <li>Arabic — Very Good (Read/Write)</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="section-label">Work History</div>
+  <div class="section-title">Professional Experience</div>
+  <div class="section-sub">Positions I have held in teaching and ICT.</div>
+
+  <div class="exp-timeline">
+    <div class="exp-item reveal">
+      <div class="exp-dot">💻</div>
+      <div class="exp-content">
+        <div class="exp-period">Current</div>
+        <h3>Computer Programming Teacher</h3>
+        <div class="exp-org">Arusha Islamic Girls Secondary School — Arusha, Tanzania</div>
+        <div class="exp-desc">Teaching computer programming concepts and practical coding skills to secondary school students. Developing curriculum materials, lesson plans, and practical exercises aligned to the TIE syllabus.</div>
+        <div class="exp-tags"><span class="exp-tag">Programming</span><span class="exp-tag">Curriculum Design</span><span class="exp-tag">Teaching</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot">🖥️</div>
+      <div class="exp-content">
+        <div class="exp-period">Current</div>
+        <h3>Computer Science Teacher</h3>
+        <div class="exp-org">Arusha Islamic Girls Secondary School — Arusha, Tanzania</div>
+        <div class="exp-desc">Teaching Computer Science theory and practical sessions including hardware, software, networks, and programming fundamentals. Creating exam papers and student notes aligned to NECTA standards.</div>
+        <div class="exp-tags"><span class="exp-tag">Computer Science</span><span class="exp-tag">NECTA</span><span class="exp-tag">Exam Papers</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot">📐</div>
+      <div class="exp-content">
+        <div class="exp-period">Current</div>
+        <h3>Mathematics Teacher</h3>
+        <div class="exp-org">Arusha Islamic Girls Secondary School — Arusha, Tanzania</div>
+        <div class="exp-desc">Teaching Mathematics for Form 1–3 under the Tanzania Institute of Education (TIE) syllabus. Topics include Numbers, Algebra, Geometry, Sequences & Series, Sets, Ratios, and Variation. Creating detailed lesson plans, teaching scripts, student notes, and monthly NECTA-format exam papers.</div>
+        <div class="exp-tags"><span class="exp-tag">Mathematics</span><span class="exp-tag">Form 1–3</span><span class="exp-tag">TIE Syllabus</span><span class="exp-tag">Lesson Plans</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot">🏫</div>
+      <div class="exp-content">
+        <div class="exp-period">2024</div>
+        <h3>Computer Science Teacher</h3>
+        <div class="exp-org">Tanga Technical Secondary School — Tanga, Tanzania</div>
+        <div class="exp-desc">Taught Computer Science at secondary level, covering theoretical and practical aspects of the subject. Delivered lessons and assessments in line with national curriculum standards.</div>
+        <div class="exp-tags"><span class="exp-tag">Computer Science</span><span class="exp-tag">Technical Education</span><span class="exp-tag">Tanga</span></div>
+      </div>
+    </div>
+
+    <div class="exp-item reveal">
+      <div class="exp-dot">📚</div>
+      <div class="exp-content">
+        <div class="exp-period">Jul 2024 – Nov 2024</div>
+        <h3>Teacher (Block Teaching Practice)</h3>
+        <div class="exp-org">Sotele Secondary School</div>
+        <div class="exp-desc">Completed supervised block teaching practice as part of teacher education programme. Delivered lessons, received mentorship, and demonstrated classroom management and subject delivery competency.</div>
+        <div class="exp-tags"><span class="exp-tag">Teaching Practice</span><span class="exp-tag">Mentorship</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="section-label">My Work</div>
+  <div class="section-title">Featured Projects</div>
+  <div class="section-sub">Real systems built and deployed for real users.</div>
+
+  <div class="projects-grid">
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0a1628,#1a2a4a)">
+        🎓<span class="project-type-badge">Live</span>
+      </div>
+      <div class="project-body">
+        <h3>Kighare Alumni Management System</h3>
+        <p>Full-featured PWA managing alumni members — with soft deletes, event tracking, WhatsApp image sharing, member status automation based on event types, alphabetical sorting, and a Supabase backend.</p>
+        <div class="project-stack">
+          <span class="stack-badge">HTML/JS</span><span class="stack-badge">Supabase</span>
+          <span class="stack-badge">PWA</span><span class="stack-badge">Canvas API</span>
+          <span class="stack-badge">GitHub Pages</span>
+        </div>
+        <a href="#contact" class="project-link">Request Demo →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#0d1f12,#1a3a1f)">
+        🏫<span class="project-type-badge">Live</span>
+      </div>
+      <div class="project-body">
+        <h3>Mndeme Secondary School ERP</h3>
+        <p>Comprehensive school management system — students, teachers, subjects, exams, results, attendance, fees, payroll, assets, and SMS delivery via Notify Africa API. Modern dark UI with full module coverage.</p>
+        <div class="project-stack">
+          <span class="stack-badge">PHP</span><span class="stack-badge">MySQL</span>
+          <span class="stack-badge">InfinityFree</span><span class="stack-badge">SMS API</span>
+        </div>
+        <a href="#contact" class="project-link">Request Demo →</a>
+      </div>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-thumb" style="background:linear-gradient(135deg,#1a0a28,#2a1a4a)">
+        💰<span class="project-type-badge">Live</span>
+      </div>
+      <div class="project-body">
+        <h3>Community Fund Management App</h3>
+        <p>Role-based community fund tracker with contribution tracking, event management, and complete Swahili interface — built for Kighare Umoja community group with Supabase backend.</p>
+        <div class="project-stack">
+          <span class="stack-badge">HTML/JS</span><span class="stack-badge">Supabase</span>
+          <span class="stack-badge">Role Auth</span><span class="stack-badge">Swahili UI</span>
+        </div>
+        <a href="#contact" class="project-link">Request Demo →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EDUCATION -->
+<section id="education">
+  <div class="section-label">Academic Background</div>
+  <div class="section-title">Education</div>
+
+  <div class="edu-timeline">
+    <div class="edu-item reveal">
+      <div class="edu-dot">🎓</div>
+      <div class="edu-content">
+        <div class="edu-year">2024 — Present</div>
+        <h3>Bachelor of Education (Science) — Mathematics & Computer Science</h3>
+        <div class="edu-school">Mwenge Catholic University (MWECAU) — Moshi, Tanzania</div>
+        <div class="edu-desc">Pursuing a degree in Education with specialisation in Mathematics and Computer Science. Coursework includes pedagogy, curriculum design, ICT integration in education, and subject-specific methodology.</div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">📜</div>
+      <div class="edu-content">
+        <div class="edu-year">2021 — 2023</div>
+        <h3>Advanced Certificate of Secondary Education (ACSE)</h3>
+        <div class="edu-school">Klerruu Teachers' College — Tanzania</div>
+        <div class="edu-desc">Completed advanced secondary teacher education programme with strong academic performance.</div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">📋</div>
+      <div class="edu-content">
+        <div class="edu-year">2021 — 2024</div>
+        <h3>Diploma in Secondary Education</h3>
+        <div class="edu-school">Klerruu Teachers' College — Tanzania</div>
+        <div class="edu-desc">GPA: 2.8 out of 5.0. Comprehensive teacher training covering education theory, pedagogy, classroom management, and subject-specific teaching methods for secondary level.</div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">🖥️</div>
+      <div class="edu-content">
+        <div class="edu-year">2023 — 2024</div>
+        <h3>Certificate of Computer Science</h3>
+        <div class="edu-school">Open University of Tanzania</div>
+        <div class="edu-desc">Completed a certificate programme in Computer Science covering programming fundamentals, database systems, networks, and software development principles.</div>
+      </div>
+    </div>
+
+    <div class="edu-item reveal">
+      <div class="edu-dot">🏫</div>
+      <div class="edu-content">
+        <div class="edu-year">2017 — 2020</div>
+        <h3>Certificate of Secondary Education (CSE)</h3>
+        <div class="edu-school">Kighare Secondary School — Tanzania</div>
+        <div class="edu-desc">Completed ordinary level secondary education. Strong foundation in Mathematics and Sciences. Member of Class of 2020 alumni community.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CERTS -->
+<section id="certifications">
+  <div class="section-label">Credentials</div>
+  <div class="section-title">Certifications & Training</div>
+  <div class="cert-grid">
+    <div class="cert-card reveal"><div class="cert-icon">🛡️</div><h4>XSS — Reflected & Stored</h4><div class="cert-issuer">TryHackMe</div></div>
+    <div class="cert-card reveal"><div class="cert-icon">💉</div><h4>SQL Injection</h4><div class="cert-issuer">TryHackMe</div></div>
+    <div class="cert-card reveal"><div class="cert-icon">🌐</div><h4>Information Systems Security</h4><div class="cert-issuer">ICT 222 / CSC 322</div></div>
+    <div class="cert-card reveal"><div class="cert-icon">🔍</div><h4>Nmap & Packet Analysis</h4><div class="cert-issuer">Practical Lab</div></div>
+    <div class="cert-card reveal"><div class="cert-icon">📊</div><h4>MS Word / Excel / PowerPoint</h4><div class="cert-issuer">Very Good Proficiency</div></div>
+    <div class="cert-card reveal"><div class="cert-icon">📱</div><h4>PWA & Mobile Development</h4><div class="cert-issuer">Deployed Projects</div></div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="contact-wrap reveal">
+    <div class="section-label" style="justify-content:center">Get In Touch</div>
+    <div class="contact-title">Let's Build<br><span class="highlight">Something Great</span><br>Together</div>
+    <p class="contact-desc">Looking for a reliable developer or ICT educator who delivers clean, functional solutions? I'm available for freelance projects, contract work, or teaching engagements — worldwide.</p>
+
+    <div class="contact-grid">
+      <div class="contact-info-card">
+        <div class="ci-icon">📧</div>
+        <div><div class="ci-label">Email</div><div class="ci-value">sadikimndeme650@gmail.com</div></div>
+      </div>
+      <div class="contact-info-card">
+        <div class="ci-icon">📱</div>
+        <div><div class="ci-label">WhatsApp / Phone</div><div class="ci-value">+255 613 554 953</div></div>
+      </div>
+      <div class="contact-info-card">
+        <div class="ci-icon">📍</div>
+        <div><div class="ci-label">Location</div><div class="ci-value">Arusha, Tanzania 🇹🇿</div></div>
+      </div>
+      <div class="contact-info-card">
+        <div class="ci-icon">🌍</div>
+        <div><div class="ci-label">Availability</div><div class="ci-value">Remote — Worldwide</div></div>
+      </div>
+    </div>
+
+    <div class="contact-links">
+      <a href="https://fiverr.com" target="_blank" class="contact-btn cb-fiverr">🟢 Hire on Fiverr</a>
+      <a href="https://upwork.com" target="_blank" class="contact-btn cb-upwork">💼 Hire on Upwork</a>
+      <a href="https://wa.me/255613554953" target="_blank" class="contact-btn cb-wa">📱 WhatsApp Me</a>
+      <a href="mailto:sadikimndeme650@gmail.com" class="contact-btn cb-email">✉️ Send Email</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Sadiki D. Ramadhani</div>
+  <p>© 2025 Sadiki Daudi Ramadhani — Full-Stack Developer & Educator · Tanzania 🇹🇿</p>
+  <p style="font-size:0.72rem;color:var(--muted)">HTML · CSS · JavaScript</p>
+</footer>
+
+<script>
+  const phrases=["Web App Development","PHP + MySQL Backend","Supabase + JavaScript","Python & C++ Programming","Cybersecurity & Network Security","School Management Systems","PWA & Mobile-First Design","Computer Science Teaching"];
+  let pIdx=0,cIdx=0,del=false;
+  const el=document.getElementById('typed-text');
+  // ── HERO IMAGE UPLOAD ──
+  const fileInput = document.getElementById('hero-file-input');
+  const imgEl     = document.getElementById('hero-img-el');
+  const placeholder = document.getElementById('img-placeholder');
+  const nameOverlay = document.getElementById('img-name-overlay');
+  const changeBtn   = document.getElementById('change-btn');
+
+  // Load saved image from localStorage if exists
+  const saved = localStorage.getItem('sadiki_hero_img');
+  if(saved){ showImage(saved); }
+
+  fileInput.addEventListener('change', function(e){
+    const file = e.target.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev){
+      const dataUrl = ev.target.result;
+      localStorage.setItem('sadiki_hero_img', dataUrl);
+      showImage(dataUrl);
+    };
+    reader.readAsDataURL(file);
+    // prevent the whole section click from re-triggering
+    e.stopPropagation();
+  });
+
+  function showImage(src){
+    imgEl.src = src;
+    imgEl.classList.add('loaded');
+    placeholder.classList.add('hidden');
+    nameOverlay.classList.add('visible');
+    changeBtn.classList.add('visible');
+    // stop section click from opening file picker when image is shown
+    document.getElementById('hero-image').onclick = null;
+  }
+
+  changeBtn.addEventListener('click', function(e){
+    e.stopPropagation();
+    fileInput.click();
+  });
+
+  // ── TYPED TEXT ──
+  function type(){
+    const w=phrases[pIdx];
+    if(!del){el.textContent=w.slice(0,++cIdx);if(cIdx===w.length){del=true;return setTimeout(type,2000)}}
+    else{el.textContent=w.slice(0,--cIdx);if(cIdx===0){del=false;pIdx=(pIdx+1)%phrases.length}}
+    setTimeout(type,del?45:75);
+  }
+  type();
+
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach((e,i)=>{if(e.isIntersecting){setTimeout(()=>e.target.classList.add('visible'),i*70);obs.unobserve(e.target)}});
+  },{threshold:0.1});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
